@@ -5,16 +5,16 @@ Idea.
 This server just coordinates a shared array of lines. Clients connect using the RPC (which uses push-style notifications) and download line deltas. Lines are kept in a central database so that
 drawings are persistent. Drawings are represented in three-dimensional space. All lines, then, have endpoints in 3D and form a structure rather than an image.
 
-caterwaul.clone('std seq continuation montenegro')(function () {
-  let*[db = caterwaul.db.file('drawing-db'), clients = {}] in
+caterwaul.clone('std seq continuation montenegro db.file')(function () {
+  l*[db = caterwaul.db.file('drawing-db'), clients = {}] in
   caterwaul.montenegro.server(8080) /se.server[
-    server.file('/', client).alias('/', '/index.html'),
+    server.file('/', 'client/').alias('/', '/index.html'),
 
-    let/cps[(drawing, n) <- server.rpc('/listen', 'listen(drawing, [n]) listens for updates for a particular drawing.', _)]
-           [(clients[drawing] || (clients[drawing] = seq[~[]])).push({reply: this, last: n || 0})],
+    l/cps[(drawing, n) <- server.rpc('/listen', 'listen(drawing, [n]) listens for updates for a particular drawing. If n is absent or 0, you get the whole drawing.', _)]
+         [(clients[drawing] || (clients[drawing] = seq[~[]])).push({reply: this, last: n || 0})],
 
-    let/cps[(drawing, v1, v2) <- server.rpc('/draw', 'draw(drawing, v1, v2) draws a line.', _)]
-           [add_line_to(drawing, v1, v2), clients[drawing] && update_clients(clients[drawing]), delete clients[drawing]],
+    l/cps[(drawing, vs) <- server.rpc('/draw', 'draw(drawing, vs) draws one or more lines. vs should look like [{v1: [x, y, z], v2: [x, y, z]}, ...].', _)]
+         [add_lines_to(drawing, vs), clients[drawing] && update_clients(clients[drawing]), delete clients[drawing], this('OK')],
            
-    where*[add_line_to(drawing, v1, v2) = db(drawing)(_) /cps[db(drawing)({count: _.count + 1} /se.r[r[_.count] = {v1: v1, v2: v2}])],
-           update_clients(cs)           = db(drawing)(_) /cps.lines[seq[cs *![_.reply(lines.slice(_.n))]]]]]})();
+    where*[add_lines_to(drawing, vs) = db(drawing)(_) /cps[db(drawing)({length: (_.length || 0) + vs.length} /se.r[seq[~vs *!v[r[(_.length || 0) + vi] = {v1: v.v1, v2: v.v2}]]])],
+           update_clients(cs)        = db(drawing)(_) /cps.lines[l[ls = seq[~lines]] in seq[cs *![_.reply(ls.slice(_.last))]]]]]})();

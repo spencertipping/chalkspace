@@ -1,0 +1,5 @@
+#!/bin/bash
+pushd client
+rm montenegro.client.js; wget spencertipping.com/montenegro/montenegro.client.js
+rm caterwaul.vector.js;  wget spencertipping.com/caterwaul.vector/caterwaul.vector.js
+popd

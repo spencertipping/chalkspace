@@ -257,12 +257,13 @@ run this script with the 'usage' argument.
 __c63395cbc6f7160b603befbb2d9b6700
 
 meta::data('default-action', 'shell');
-meta::data('libraries', <<'__ce722bcbe48dddbdf2197893432c52f9');
+meta::data('libraries', <<'__f1e4f1475cb33eafda556cf4439a658f');
 # URLs of libraries to be downloaded into the lib/ directory.
 http://spencertipping.com/caterwaul/caterwaul.all.js
 http://spencertipping.com/caterwaul.queue.blocking/caterwaul.queue.blocking.js
 http://spencertipping.com/caterwaul.db.file/caterwaul.db.file.js
-__ce722bcbe48dddbdf2197893432c52f9
+http://spencertipping.com/montenegro/montenegro.server.js
+__f1e4f1475cb33eafda556cf4439a658f
 
 meta::data('license', <<'__3c6177256de0fddb721f534c3ad8c0ee');
 MIT License
@@ -290,6 +291,7 @@ __3c6177256de0fddb721f534c3ad8c0ee
 meta::data('main', 'server.js');
 meta::data('name', 'build');
 meta::data('quiet', '1');
+meta::data('random-number', '0.684080534455465');
 meta::data('sources', '# The source files for your program -- all except the server process:');
 meta::data('watching', '1');
 meta::function('cat', 'join "\\n", retrieve(@_);');
