@@ -242,7 +242,7 @@ run this script with the 'usage' argument.
 
 __c63395cbc6f7160b603befbb2d9b6700
 
-meta::data('default-action', 'shell');
+meta::data('default-action', 'queue');
 meta::data('license', <<'__3c6177256de0fddb721f534c3ad8c0ee');
 MIT License
 Copyright (c) 2010 Spencer Tipping
@@ -952,6 +952,19 @@ __6999988eaf441c9b1282e03e1db427b5
 meta::message_color('state', 'purple');
 meta::message_color('states', 'yellow');
 meta::message_color('watch', 'blue');
+meta::note('queue', <<'__c524988cbae18f2872d99721b9894ec0');
+Idea.
+Chalkspace is a 3D collaborative drawing environment. The idea is that it behaves like a chalkboard, but you can draw on one of many planes. These planes have various orientations in 3D space.
+For various reasons, this isn't a general-purpose modeler. It's just a drawing environment designed with a nice surface aesthetic (I think it will make it seem like there's more space than a
+regular 2D screen).
+__c524988cbae18f2872d99721b9894ec0
+
+meta::parent('/home/spencertipping/bin/notes', <<'__320d51928ec8e2e370d67d30abe059b5');
+function::note
+meta::type::note
+parent::object
+__320d51928ec8e2e370d67d30abe059b5
+
 meta::parent('object', <<'__274768cabc5dcef6880980c5158cefe2');
 bootstrap::initialization
 bootstrap::perldoc
