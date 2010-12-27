@@ -1,0 +1,20 @@
+Chalkspace server | Spencer Tipping
+Licensed under the terms of the MIT source code license
+
+Idea.
+This server just coordinates a shared array of lines. Clients connect using the RPC (which uses push-style notifications) and download line deltas. Lines are kept in a central database so that
+drawings are persistent. Drawings are represented in three-dimensional space. All lines, then, have endpoints in 3D and form a structure rather than an image.
+
+caterwaul.clone('std seq continuation montenegro')(function () {
+  let*[db = caterwaul.db.file('drawing-db'), clients = {}] in
+  caterwaul.montenegro.server(8080) /se.server[
+    server.file('/', client).alias('/', '/index.html'),
+
+    let/cps[(drawing, n) <- server.rpc('/listen', 'listen(drawing, [n]) listens for updates for a particular drawing.', _)]
+           [(clients[drawing] || (clients[drawing] = seq[~[]])).push({reply: this, last: n || 0})],
+
+    let/cps[(drawing, v1, v2) <- server.rpc('/draw', 'draw(drawing, v1, v2) draws a line.', _)]
+           [add_line_to(drawing, v1, v2), clients[drawing] && update_clients(clients[drawing]), delete clients[drawing]],
+           
+    where*[add_line_to(drawing, v1, v2) = db(drawing)(_) /cps[db(drawing)({count: _.count + 1} /se.r[r[_.count] = {v1: v1, v2: v2}])],
+           update_clients(cs)           = db(drawing)(_) /cps.lines[seq[cs *![_.reply(lines.slice(_.n))]]]]]})();
