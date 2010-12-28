@@ -28,8 +28,8 @@ along the Y (vertical) axis.
 
   Viewport geometry.
   The canvas is considered to be at z = 0, which is 300 units away from the viewport. This gives a view angle of about 45 degrees on a small screen, and closer to 60 degrees on a large screen.
-  Reverse-projection is basically the ray-tracing algorithm; we need to find the UV coordinates of the intersection with the plane. The math is fairly simple. We can project the viewport into
-  the plane, then project the viewport-screen ray, and then multiply by the factor required to reach the plane. This gives us surface coordinates.
+  Reverse-projection is basically the ray-tracing algorithm; we need to find the coordinates of the intersection with the plane. The math is fairly simple. We can dot the viewport-screen ray
+  against the plane normal vector to find the intersection distance. Then we just project the ray by that amount. (This follows because the normal vector is normalized.)
 
   Distance between the plane and a point is also simple. We just need to project the vector between a point on the plane and the point in question onto the plane's normal vector. That new
   vector's length is the distance. (We can omit the normal vector measurement since we know it's a unit vector anyway.)
