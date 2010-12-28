@@ -13,6 +13,7 @@
 
       _.toString() = '<#{this.x}, #{this.y}, #{this.z}>',
 
+      _.unit(x)    = this.times((x || 1.0) / Math.sqrt(this.dot(this))),
       _.proj(v)    = v.times(this.dot(v) / v.dot(v)),
       _.orth(v)    = this.plus(this.proj(v), -1)]]});
 

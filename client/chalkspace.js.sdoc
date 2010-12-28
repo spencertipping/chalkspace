@@ -16,14 +16,14 @@ along the Y (vertical) axis.
 
   $(caterwaul.clone('std seq continuation montenegro vector')(function () {
     l*[b = $('body'), screen = html[canvas] /se[b.append(_)], rpc = caterwaul.montenegro.rpc /re[{listen: _('/listen'), draw: _('/draw')}]] in
-    screen /se[b.resize(_) /cps.e[_.attr({width: b.width(), height: b.height()}), _.repaint()],
+    screen /se[$(window).resize(_) /cps.e[_[0].width = w.width(), _[0].height = w.height(), where[w = $(window)], _.repaint()],
 
-               _.context()     = _[0].getContext('2d'),
-               _.clear()       = _.context() /se[_.fillStyle = '#222', _.globalAlpha = 1.0, _.fillRect(0, 0, _.width, _.height)],
-               _.line(v1, v2)  = _.context() /se[_.strokeStyle = '#eee', _.strokeWidth = 4.0 / d, _.globalAlpha = 1.0 / d /re[_ > 1 ? 1 : _ < 0 ? 0 : _],
-                                                 let[v1 = project(v1)] in _.moveTo(v1.x, v1.y), let[v2 = project(v2)] in _.lineTo(v2.x, v2.y), where[d = depth(v1, v2)]],
+               _.context         = _[0].getContext('2d'),
+               _.clear()         = _.context /se[_.clearRect(0, 0, 500, 500), _.fillStyle = '#10181c', _.globalAlpha = 1.0, _.fillRect(0, 0, screen.width(), screen.height())],
+               _.line(v1, v2, o) = _.context /se[_.strokeStyle = '#eee', _.strokeWidth = 2.0 / d, _.globalAlpha = (o || 1.0) / d /re[_ > 1 ? 1 : _ < 0 ? 0 : _], _.beginPath(),
+                                                 project(v1) /se.v[_.moveTo(v.x, v.y)], project(v2) /se.v[_.lineTo(v.x, v.y)], _.stroke(), _.closePath(), where[d = depth(v1, v2)]],
 
-               _.draw_cursor() = _ /se[seq[cursor_offset *!o[_.line(cursor, cursor.plus(o)), _.line(cursor, cursor.plus(o, -1))]]],
+               _.draw_cursor() = _ /se[_.line(cursor, cursor.plus(up, 8), 0.5), _.line(cursor, cursor.plus(up.cross(plane.normal), 8), 0.5)],
                _.repaint()     = _ /se[_.clear(), seq[lines *!l[_.line(l.v1, l.v2)]], _.draw_cursor()],
 
   Viewport geometry.
@@ -38,23 +38,29 @@ along the Y (vertical) axis.
                   intersection(x, y) = l*[d = plane_distance(viewport), direction = view_at(x, y).plus(viewport, -1), dn = direction.dot(plane.normal)] in
                                        viewport.plus(direction, plane.d / dn)] in
 
-               _ /se[_.mousemove(_) /cps.e[draw([{v1: cursor, v2: v}]), when[down], cursor = v, repaint(), where[v = intersection(e.pageX, e.pageY)]],
-                     _.mousedown(_) /cps.e[down = true],
-                     _.mouseup(_)   /cps.e[down = false],
-                     where[down = false]],
+               _ /se[_.mousemove(_) /cps.e[shift_down ? viewport /se[_.x += e.pageX - down.x, _.y += e.pageY - down.y, down.x = e.pageX, down.y = e.pageY] :
+                                                        draw([{v1: cursor, v2: v}]), when[down],
+                                           cursor = v, _.repaint(), where[v = intersection(e.pageX + viewport.x - _.width() / 2, e.pageY + viewport.y - _.height() / 2)]],
 
-               where*[project(v)    = {x: (v.x - viewport.x) / (v.z - viewport.z), y: (v.y - viewport.y) / (v.z - viewport.z)},
-                      depth(v1, v2) = viewport.z - (v1.z + v2.z) / 2.0,
+                     _.mousedown(_) /cps.e[down = {x: e.pageX, y: e.pageY}],
+                     _.mouseup(_)   /cps.e[down = false],
+
+                     $(document).keydown(_) /cps.e[shift_down = e.which === 16, e.which === 32 && plane.flip() /se[screen.repaint()]],
+                     $(document).keyup(_)   /cps.e[shift_down = false],
+
+                     where[down = false, shift_down = false]],
+
+               $(window).resize(), listen(),
+               where*[project(v)    = l[z = (v.z - viewport.z) / -viewport.z] in {x: (v.x - viewport.x) / z + _.width() / 2, y: (v.y - viewport.y) / z + _.height() / 2},
+                      depth(v1, v2) = ((v1.z + v2.z) / 2.0 - viewport.z) / -viewport.z,
                       view_at(x, y) = new caterwaul.vector(x, y, 0),
                       drawing       = 'test',
                       lines         = seq[~[]],
                       cursor        = new caterwaul.vector(0, 0, 0),
-                      cursor_offset = seq[~[new caterwaul.vector(4, 0, 0), new caterwaul.vector(0, 4, 0), new caterwaul.vector(0, 0, 4)]],
+                      up            = new caterwaul.vector(0, 1, 0),
 
-                      v             = new caterwaul.vector(0, 1, 0),
-
-                      listen()      = rpc.listen(drawing, lines.length, _) /cps.ls[seq[~ls *!+(lines/mb/push)], screen.repaint(), listen()],
+                      listen()      = rpc.listen(drawing, lines.length, _) /cps.ls[seq[~ls *![lines.push(_)]], _.repaint(), listen()],
                       draw(ls)      = rpc.draw(drawing, ls),
 
-                      plane         = {normal: new caterwaul.vector(-0.8, 0.04, 0.4).unit(), d: 10} /se[_.flip() = _.normal = _.normal /re[new caterwaul.vector(-_.z, _.y, _.x)]],
-                      viewport      = new caterwaul.vector(0, 0, -300)]]});
+                      plane         = {normal: new caterwaul.vector(-0.2, 0, 0.4).unit(), d: 300} /se[_.flip() = _.normal = _.normal /re[new caterwaul.vector(_.z, _.y, _.x)]],
+                      viewport      = new caterwaul.vector(0, 0, -300)]]}));
