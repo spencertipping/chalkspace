@@ -15,16 +15,20 @@ along the Y (vertical) axis.
   Shift-drag moves the viewport, the spacebar flips the plane, and the up/down arrows and the mousewheel move the plane along its normal vector. Dragging the mouse causes lines to be drawn.
 
   $(caterwaul.clone('std seq continuation montenegro vector')(function () {
-    l*[b = $('body'), screen = html[canvas] /se[b.append(_)], rpc = caterwaul.montenegro.rpc /re[{listen: _('/listen'), draw: _('/draw')}]] in
-    screen /se[$(window).resize(_) /cps.e[_[0].width = w.width(), _[0].height = w.height(), where[w = $(window)], _.repaint()],
+    $.fn.gc() = this[0].getContext('2d');
 
-               _.context         = _[0].getContext('2d'),
-               _.clear()         = _.context /se[_.clearRect(0, 0, 500, 500), _.fillStyle = '#10181c', _.globalAlpha = 1.0, _.fillRect(0, 0, screen.width(), screen.height())],
-               _.line(v1, v2, o) = _.context /se[_.strokeStyle = '#eee', _.strokeWidth = 2.0 / d, _.globalAlpha = (o || 1.0) / d /re[_ > 1 ? 1 : _ < 0 ? 0 : _], _.beginPath(),
-                                                 project(v1) /se.v[_.moveTo(v.x, v.y)], project(v2) /se.v[_.lineTo(v.x, v.y)], _.stroke(), _.closePath(), where[d = depth(v1, v2)]],
+    l*[b = $('body'), screen = html[canvas] /se[b.append(_)], backing = html[canvas /hide()] /se[b.append(_)], rpc = caterwaul.montenegro.rpc /re[{listen: _('/listen'), draw: _('/draw')}]] in
+    screen /se[$(window).resize(_) /cps.e[_[0].width = backing[0].width = w.width(), _[0].height = backing[0].height = w.height(), where[w = $(window)], _.redraw_lines(), _.repaint()],
 
-               _.draw_cursor() = _ /se[_.line(cursor, cursor.plus(up, 8), 0.5), _.line(cursor, cursor.plus(up.cross(plane.normal), 8), 0.5)],
-               _.repaint()     = _ /se[_.clear(), seq[lines *!l[_.line(l.v1, l.v2)]], _.draw_cursor()],
+               $.fn.line(v1, v2, o) = this.gc() /se[_.strokeStyle = '#eee', _.strokeWidth = 2.0 / d, _.globalAlpha = (o || 1.0) / d /re[_ > 1 ? 1 : _ < 0 ? 0 : _], _.beginPath(),
+                                                    project(v1) /se.v[_.moveTo(v.x, v.y)], project(v2) /se.v[_.lineTo(v.x, v.y)], _.stroke(), _.closePath(), where[d = depth(v1, v2)]],
+
+               _.clear()        = _.gc()       /se[_.globalAlpha = 1.0, _.drawImage(backing[0], 0, 0)],
+               _.redraw_lines() = backing.gc() /se[_.fillStyle = '#10181c', _.globalAlpha = 1.0, _.fillRect(0, 0, backing[0].width, backing[0].height),
+                                                   seq[lines *!l[backing.line(l.v1, l.v2)]]],
+
+               _.draw_cursor()  = _ /se[_.line(cursor, cursor.plus(up, 8), 0.5), _.line(cursor, cursor.plus(up.cross(plane.normal), 8), 0.5)],
+               _.repaint()      = _ /se[_.clear(), _.draw_cursor()],
 
   Viewport geometry.
   The canvas is considered to be at z = 0, which is 300 units away from the viewport. This gives a view angle of about 45 degrees on a small screen, and closer to 60 degrees on a large screen.
@@ -40,7 +44,7 @@ along the Y (vertical) axis.
 
                _ /se[_.mousemove(_) /cps.e[shift_down ? viewport /se[_.x += e.pageX - down.x, _.y += e.pageY - down.y, down.x = e.pageX, down.y = e.pageY] :
                                                         draw([{v1: cursor, v2: v}]), when[down],
-                                           cursor = v, _.repaint(), where[v = intersection(e.pageX + viewport.x - _.width() / 2, e.pageY + viewport.y - _.height() / 2)]],
+                                           cursor = v, _.redraw_lines(), _.repaint(), where[v = intersection(e.pageX + viewport.x - _.width() / 2, e.pageY + viewport.y - _.height() / 2)]],
 
                      _.mousedown(_) /cps.e[down = {x: e.pageX, y: e.pageY}],
                      _.mouseup(_)   /cps.e[down = false],
@@ -59,7 +63,7 @@ along the Y (vertical) axis.
                       cursor        = new caterwaul.vector(0, 0, 0),
                       up            = new caterwaul.vector(0, 1, 0),
 
-                      listen()      = rpc.listen(drawing, lines.length, _) /cps.ls[seq[~ls *![lines.push(_)]], _.repaint(), listen()],
+                      listen()      = rpc.listen(drawing, lines.length, _) /cps.ls[seq[~ls *![lines.push(_)]], _.redraw_lines(), _.repaint(), listen()],
                       draw(ls)      = rpc.draw(drawing, ls),
 
                       plane         = {normal: new caterwaul.vector(-0.2, 0, 0.4).unit(), d: 300} /se[_.flip() = _.normal = _.normal /re[new caterwaul.vector(_.z, _.y, _.x)]],
